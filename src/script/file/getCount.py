@@ -1,12 +1,12 @@
 import os
 from rich.console import Console
-
+import utils
 console = Console()
 
-args = {
+rules = {
     "path": {
         'type':'str',
-        'rules': 2,
+        'rules': 1,
         'value':None
     },
     "hide":{
@@ -17,24 +17,28 @@ args = {
 }
 
 
-def prints():
-    for  arg in args:
-        print(args[arg]['value'])
+def main(cmd:dict):
+    path = cmd['path']['value'][0]
 
-def main():
-    path = args['path']['value']
     if not os.path.exists(path):
         raise Exception(f'File {path} does not exist')
+
     fileCount = 0
     dirCount = 0
-    for root, dirs, files in os.walk(path):
-        for dir in dirs:
-            dirCount += 1
-            console.print(os.path.join(root, dir),style='bold yellow')
 
-        for file in files:
-            fileCount += 1
-            console.print(os.path.join(root, file),style='#af00ff')
+    if cmd['hide']['value']:
+        for root, dirs, files in os.walk(path):
+            for dir in dirs:
+                dirCount += 1
+                console.print(os.path.join(root, dir),style='bold yellow')
+
+            for file in files:
+                fileCount += 1
+                console.print(os.path.join(root, file),style='#af00ff')
+    else:
+        for root, dirs, files in os.walk(path):
+            dirCount += len(dirs)
+            fileCount += len(files)
 
     console.rule()
     console.print(f'Files Count:{fileCount}',style='bold green')

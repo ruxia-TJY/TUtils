@@ -1,7 +1,11 @@
 import os
 import sys
 
-root_dir = os.getcwd()
+ROOT_DIR = ''
+SCRIPT_DIR = os.path.join(ROOT_DIR, 'script')
 
-script_dir = os.path.join(root_dir,'script')
+SCRIPTDB = {}
+
+COLOR_LIST = ["green", "blue", "yellow", "magenta", "cyan"]
+
 

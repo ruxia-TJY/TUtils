@@ -1,24 +1,26 @@
 import argparse
 import os
-from fontTools.misc.cython import returns
-from pygments import highlight
-from pygments.formatters import TerminalFormatter
-from pygments.lexers import Python3Lexer
-from rich.console import Console
+import sys
 
+import config
 from tUtils import *
-
 console = Console()
 
 def parseArgs() -> TUtils:
     parser = argparse.ArgumentParser()
     parser = argparse.ArgumentParser(description="TUtils means T's Utils")
-    parser.add_argument("--list",'-l', action="store_true", help="The list of files to be processed")
-    parser.add_argument('run',type=str,nargs='+',help="run script")
+    parser.add_argument("--list",'-l', action="store_true",default=False,
+                        help="The list of files to be processed")
+    parser.add_argument('--run','-r',type=str,nargs='+',
+                        help="run script")
+    parser.add_argument('--code',type=str,nargs='+',
+                        help="show script code")
     args = parser.parse_args()
     tUtils = TUtils(args)
     return tUtils
 
 if __name__ == '__main__':
+    config.ROOT_DIR = os.path.abspath(sys.argv[0])
     tUtils = parseArgs()
+    utils.readDataList()
     tUtils.run()
