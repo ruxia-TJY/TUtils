@@ -1,6 +1,5 @@
 import os
 from rich.console import Console
-import utils
 console = Console()
 
 rules = {

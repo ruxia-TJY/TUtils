@@ -1,10 +1,17 @@
-import argparse
+'''
+    TUtils
+
+    ruxia-TJY<ruxia.tjy@qq.com>
+
+    MIT License
+'''
 import os
 import sys
+import argparse
 
+from tUtils import TUtils
 import config
-from tUtils import *
-console = Console()
+import utils
 
 def parseArgs() -> TUtils:
     parser = argparse.ArgumentParser()

@@ -1,8 +1,8 @@
 import os
-import sys
 
 ROOT_DIR = ''
 SCRIPT_DIR = os.path.join(ROOT_DIR, 'script')
+SCRIPT_PATH = os.path.abspath(SCRIPT_DIR)
 
 SCRIPTDB = {}
 

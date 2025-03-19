@@ -1,22 +1,32 @@
 import argparse
+import sys
 from pygments import highlight
 from pygments.formatters import TerminalFormatter
 from pygments.lexers import Python3Lexer
 import os
+from rich.console import Console
+import importlib.util
 
 import config
-from rich.console import Console
 import utils
 
 class TUtils:
+    '''
+
+    '''
     def __init__(self,args:argparse.Namespace):
         self.args = args
 
     def run(self):
         if not any(vars(self.args).values()):
-            print('''TUtils means T's Utils'
-build by ruxia-TJY<ruxia.tjy@qq.com>
+            print('''TUtils means T's Utils
 use -h or --help for more information
+
+Author ruxia-TJY<ruxia.tjy@qq.com>
+open source https://github.com/ruxia-TJY/TUtils
+License MIT
+
+Thanks for use!
             ''')
 
         if self.args.list:
@@ -54,22 +64,33 @@ use -h or --help for more information
                 print(highlight_code)
 
     def runScript(self,args):
-        if '.' in args[0]:
-            print("has")
-        else:
-            try:
-                module_name = args[0]
-                target = f'import script.file.{args[0]} as f'
-                exec(target,globals())
+        module_name = args[0]
 
-                args = args[1:]
-                try:
-                    d = utils.parse(f.rules,args)
-                    f.main(d)
-                except Exception as e:
-                    print(e)
-            except Exception as e:
-                print(e)
+        if '.' in module_name:
+            ret = utils.checkInScriptDB(module_name)
+            if ret is None:
+                Console().print(f"{module_name} not exist!", style="bold red")
+                return None
+            path = os.path.join(config.SCRIPT_DIR, ret.split('.')[0], '.'.join(ret.split('.')[1:]))
+        else:
+            ret = utils.find(module_name)
+            if ret is None:
+                Console().print(f"{module_name} not exist!", style="bold red")
+                return None
+            path = os.path.join(config.SCRIPT_PATH, ret.split('.')[0], '.'.join(ret.split('.')[1:]))
+
+        try:
+            spec = importlib.util.spec_from_file_location(module_name, path)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            sys.modules[module_name] = module
+
+            args = args[1:]
+
+            parseCmd = utils.parse(module.rules,args)
+            module.main(parseCmd)
+        except Exception as e:
+            print(e)
 
     def showList(self):
         print("List:")

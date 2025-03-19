@@ -16,6 +16,12 @@ bool_map = {
 }
 
 def modifyType(value:str, type:str):
+    '''
+    change the type from string
+    :param value: value to modify
+    :param type: target type
+    :return: value
+    '''
     if type == 'bool':
         return bool_map.get(value.lower(),None)
     if type == 'int':
@@ -26,7 +32,13 @@ def modifyType(value:str, type:str):
         return str(value)
     return None
 
-def parse(rules:dict,*cmds):
+def parse(rules:dict,*cmds) -> dict:
+    '''
+    parse command for script
+    :param rules: script rules
+    :param cmds: script commands
+    :return: parsed values
+    '''
     cmds = cmds[0]
     cmdslen = len(cmds)
     cur_index = 0
@@ -55,6 +67,7 @@ def parse(rules:dict,*cmds):
                     cur_index += 1
             rules[rule]['value'] = lst
         elif  rules[rule]['rules'] == '*':
+            # * null or more
             n = cmdslen - cur_index
             lst = []
             for i in range(n):
@@ -68,7 +81,11 @@ def parse(rules:dict,*cmds):
 
     return rules
 
-def readDataList():
+def readDataList() -> None:
+    '''
+        get script data list
+    :return: None
+    '''
     subdirs = [d for d in os.listdir(config.SCRIPT_DIR) if os.path.isdir(os.path.join(config.SCRIPT_DIR, d))]
     for dir in subdirs:
         config.SCRIPTDB[dir] = []
@@ -76,7 +93,12 @@ def readDataList():
             if file.endswith(".py"):
                  config.SCRIPTDB[dir].append(file)
 
-def findInScriptDB(name:str):
+def findInScriptDB(name:str) -> list[str]:
+    '''
+        find scripts in db
+    :param name: script name
+    :return: list
+    '''
     ret = []
     name = f'{name}.py'
     for key,value in config.SCRIPTDB.items():
@@ -84,7 +106,12 @@ def findInScriptDB(name:str):
             ret.append(f'{key}.{name}')
     return ret
 
-def find(name:str):
+def find(name:str) -> None|str:
+    '''
+        find script in db,if not only 1,do select
+    :param name: script name
+    :return: None if not found, else path
+    '''
     lst = findInScriptDB(name)
     if len(lst) == 0:
         return None
@@ -112,7 +139,13 @@ def find(name:str):
 
         return lst[int(check)]
 
-def checkInScriptDB(path:str):
+def checkInScriptDB(path:str) -> None|str:
+    '''
+    check scripts is exist in db
+    support such as file.getCount
+    :param path: script path
+    :return: None if not found, else path
+    '''
     d,name = path.split('.')
     if d not in config.SCRIPTDB.keys():
         return None
@@ -122,4 +155,3 @@ def checkInScriptDB(path:str):
         return None
 
     return f'{d}.{name}'
-
