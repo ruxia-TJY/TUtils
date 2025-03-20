@@ -66,7 +66,7 @@ def parse(rules:dict,*cmds) -> dict:
                     lst.append(modifyType(cmds[cur_index],rules[rule]['type']))
                     cur_index += 1
             rules[rule]['value'] = lst
-        elif  rules[rule]['rules'] == '*':
+        elif rules[rule]['rules'] == '*':
             # * null or more
             n = cmdslen - cur_index
             lst = []
