@@ -3,6 +3,28 @@ from rich.console import Console
 
 console = Console()
 
+info = {
+    'author':'ruxia-TJY',
+    'email':'ruxia.tjy@qq.com',
+
+    'helper': f'''\tremoveByExten path Extension1 Extension2 ...
+
+    remove file by extension
+
+ + path: the dir where the file is to be removed
+
+ + Extension1: extension
+
+ example:
+
+ remove all txt and py files
+ ```cmd
+ python app.py -r removeByExten . txt py 
+ ```
+'''
+}
+
+
 rules = {
     "path": {
         'type':'str',

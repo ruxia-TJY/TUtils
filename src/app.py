@@ -22,6 +22,10 @@ def parseArgs() -> TUtils:
                         help="run script")
     parser.add_argument('--code',type=str,nargs='+',
                         help="show script code")
+    parser.add_argument("--showhelp",type=str,nargs='+',
+                        help="Show script help")
+    parser.add_argument("--showinfo",type=str,nargs='+',
+                        help="Show script info")
     args = parser.parse_args()
     tUtils = TUtils(args)
     return tUtils

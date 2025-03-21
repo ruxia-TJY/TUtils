@@ -2,6 +2,30 @@ import os
 from rich.console import Console
 console = Console()
 
+
+info = {
+    'author':'ruxia-TJY',
+    'email':'ruxia.tjy@qq.com',
+
+    'helper': f'''\tgetCount path [show_file]
+
+    get file and dir count in path
+
+ + path: the dir path you want to get file and dir count
+
+ + show_file: default is False. to show file name
+
+ example:
+
+ to get current dir file count:
+ ```cmd
+ python app.py -r getCount . 
+ ```
+'''
+}
+
+
+
 rules = {
     "path": {
         'type':'str',

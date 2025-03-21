@@ -9,6 +9,15 @@ you must do like this
 ```python
 import the_library_you_want_name
 
+## info
+info = {
+    'author':'your_name',
+    'email':'your_email',
+    'helper':'''
+    	Script help
+    '''
+}
+
 # the rules must be have
 # rules for command Arguments
 rules = {
@@ -43,6 +52,29 @@ def main(cmd:str):
 import os
 from rich.console import Console
 console = Console()
+
+
+info = {
+    'author':'ruxia-TJY',
+    'email':'ruxia.tjy@qq.com',
+
+    'helper': f'''\tgetCount path [show_file]
+
+    get file and dir count in path
+
+ + path: the dir path you want to get file and dir count
+
+ + show_file: default is False. to show file name
+
+ example:
+
+ to get current dir file count:
+ ```cmd
+ python app.py -r getCount . 
+ ```
+'''
+}
+
 
 rules = {
     "path": {
@@ -86,6 +118,18 @@ def main(cmd:dict):
     console.print(f'Dirs Count:{dirCount}',style='bold green')
     console.print(f'Total Files:{fileCount + dirCount}',style='bold green')
 ```
+
+
+
+## info
+
+use `--showinfo`  will print all of this key and some other info
+
+use`--showhelp` will print `info['helper']` value.
+
+you can use markdown in `info['helper']` just library `rich` support
+
+
 
 
 
