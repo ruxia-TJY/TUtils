@@ -1,5 +1,7 @@
 """Parse repository index file. index.yaml"""
 from pathlib import Path
+from typing import Dict
+
 import yaml
 from .model import RepositoryIndexFileModel
 
@@ -22,6 +24,13 @@ class RepositoryIndexFile:
 
         file = RepositoryIndexFileModel(**data)
         return file
+
+    def to_dict(self) -> Dict[str, any]:
+        """
+        to dict
+        :return:
+        """
+        return self.file.to_dict()
 
     def get_instance(self):
         """get repository index file model"""

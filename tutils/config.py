@@ -86,6 +86,7 @@ class ConfigManager:
         responsity = {
             "path":str(defaultpath),
             "type":"local",
+            "link":"https://github.com/tutils/tutils/index.yaml",
         }
 
         config.repository.append(responsity)

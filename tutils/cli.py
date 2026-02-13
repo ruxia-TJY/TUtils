@@ -42,7 +42,7 @@ def show_script() -> None:
     Show scripts folder list.
     """
     scripts = get_script_manager()
-    scripts.list_scripts(True)
+    scripts.list_scripts(None,True)
 
 @app.command()
 def version() -> None:
@@ -56,13 +56,12 @@ def version() -> None:
 def list_repo() -> None:
     '''Show repository list.'''
     scripts = get_script_manager()
-    repos = scripts.list_repo()
+    repos = scripts.list_repo(True)
     if not len(repos):
-        rprint("empty:")
+        rprint("empty.")
         return None
 
-    for repo in repos:
-        rprint(repo)
+    rprint(f'Done!')
 
 @repository_app.command()
 def add(
@@ -77,6 +76,17 @@ def add(
 ) -> None:
     """Add new repository."""
     scripts = get_script_manager()
+
+@repository_app.command()
+def remove(path: str) -> None:
+    """Remove repository."""
+    pass
+
+
+@repository_app.command()
+def update() -> None:
+    """Update web repository to local."""
+    pass
 
 
 

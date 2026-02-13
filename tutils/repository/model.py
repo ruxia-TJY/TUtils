@@ -7,7 +7,11 @@ class RepositoryIndexFileModel(BaseModel):
     """Repository index file yaml model."""
     name:str = Field(default="",description="Name of the index file")
     quickly:str = Field(default="",description="Quickly the index file,for quickly check")
+    scripts:List[str] = Field(default_factory=list,description="Script files")
 
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        return self.dict()
 
 class ScriptIndexFileModel(BaseModel):
     """Script index repository yaml model."""
