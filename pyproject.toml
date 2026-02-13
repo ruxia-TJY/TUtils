@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "TUtils"
+version = "0.1.0"
+description = "TUtils command-line utility toolkit"
+readme = "README.md"
+requires-python = ">=3.8"
+license={text="MIT"}
+authors = [
+  { name = "Jared3Dev",email="ruxia.tjy@qq.com"}
+]
+keywords = ["cli","TUtils","command-line"]
+classifiers = [
+    "Environment :: Console",
+    "License :: OSI Approved :: MIT License",
+]
+dependencies = [
+    "typer[all]",
+    "rich",
+    "pyyaml>=6.0",           # YAML 配置支持
+    "pydantic>=1.10.0",      # 数据验证
+]
+
+[project.scripts]
+tutils = "tutils.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/ruxia-TJY/TUtils"
+Documentation = "https://github.com/ruxia-TJY/TUtils"
+Repository = "https://github.com/ruxia-TJY/TUtils.git"
+"Bug Tracker" = "https://github.com/ruxia-TJY/TUtils/issues"
+
+

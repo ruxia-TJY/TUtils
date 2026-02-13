@@ -1,0 +1,14 @@
+name: getFileCount
+version: 0.0.1
+description: get current folder repository count
+author: Jared3Dev
+email: ruxia.tjy@qq.com
+run:
+  getfilecount.py: main
+param:
+  - path: str
+  - show: str
+src:
+  - getfilecount.py
+
+license: MIT
