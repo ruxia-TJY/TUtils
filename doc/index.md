@@ -50,14 +50,21 @@ If you are new to TUtils, start here:
 The project follows a modular structure:
 
 
-├── assets
-├── devbuild.sh
-├── doc
-├── examples
+├── assets/
+
+├── doc/
+
+├── examples/
+
+├── test/
+
+├── tutils/
+
 ├── pyproject.toml
+
 ├── README.md
-├── test
-└── tutils
+
+└── devbuild.sh
 
 The `docs/` directory contains all project documentation and is versioned alongside the source code.
 
