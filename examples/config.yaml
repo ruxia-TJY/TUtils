@@ -1,0 +1,11 @@
+app_name: TUtils
+app_version: 0.1.0
+debug: false
+log_level: INFO
+use_color: true
+verbose: false
+repository:
+- path: /home/jared/.tutils/Scripts
+  type: local
+  link: https://github.com/tutils/tutils/index.yaml
+custom: {}

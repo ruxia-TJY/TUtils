@@ -1,25 +1,26 @@
 """Command-line interface using Typer."""
 from pathlib import Path
 from typing import Optional, Annotated, Literal
-
+import shlex
 import typer
+from rich.console import Console
 from rich import print as rprint
 
-from tutils.config import get_config, get_config_manager
+from . import const as C
+from .model import ScriptModel
+from .runner import ProcessRunner
+from .config import get_config, get_config_manager
 from .scripts import get_script_manager
 
 # 创建 Typer 应用
 app = typer.Typer(
     name="TUtils",
-    help="A powerful command-line tool.",
+    help=C.info,
 )
 
 # 创建子命令组
 repository_app = typer.Typer(help="Repository management commands.")
 app.add_typer(repository_app,name="repository")
-
-run_app = typer.Typer(help="Run Python scripts commands.")
-app.add_typer(run_app,name="run")
 
 # ==================== Main Command ====================
 
@@ -38,6 +39,8 @@ def main(
     try:
         if version_flag:
             version()
+            raise typer.Exit()
+
     except Exception as e:
         typer.echo(e)
         raise typer.Exit(code=-1)
@@ -45,7 +48,7 @@ def main(
 @app.command()
 def show_script() -> None:
     """
-    Show scripts folder list.
+    Show scripts list.
     """
     try:
         scripts = get_script_manager()
@@ -57,8 +60,67 @@ def show_script() -> None:
 @app.command()
 def version() -> None:
     """Show version information."""
-    from . import __version__
-    typer.echo(f"TUtils version {__version__}")
+    rprint(C.version)
+
+@app.command("run")
+def run_script(
+    script: Annotated[
+        Path,
+        typer.Argument(
+            ...,
+            help="Path to python script to run.",
+            file_okay=True,
+            dir_okay=False,
+            resolve_path=True)
+    ],
+        args: Annotated[
+            Optional[str],
+            typer.Argument(..., help="Arguments string passed to script (shell-like).")
+        ] = None,
+    timeout: Annotated[
+        Optional[float],
+        typer.Option("--timeout", help="Timeout seconds (float).")
+    ] = None,
+    max_lines: Annotated[
+        Optional[int],
+        typer.Option("--max-lines", help="Max output lines before stopping the process.")
+    ] = None,
+    debug: Annotated[
+        Optional[bool],
+        typer.Option("--debug", help="Enable debug mode.")
+    ] = None,
+):
+    """
+    Run a python script with streaming output and controls.
+    """
+    try:
+
+        runner = ProcessRunner()
+        script_model:ScriptModel
+
+        # assume script is path
+        if not script.exists():
+            # if do not exist, try to find in repositories
+            scripts = get_script_manager()
+            script_list = scripts.list_scripts(printit=False)
+            name = next((i for i in script_list if i.endswith(script.name)), None)
+            if name is None:
+                rprint(f"Script {script.name} not found.")
+                raise typer.Exit(code=-1)
+            script_model = scripts.get_script_by_path(name)
+            script = Path(script_model.folder_path) / script_model.run
+
+        args_list = shlex.split(args) if args else []
+
+        res = runner.run_script(str(script), args=args_list, timeout=timeout, max_lines=max_lines)
+        if debug:
+            Console().rule()
+            rprint("Debug:")
+            rprint(res)
+    except Exception as e:
+        rprint(e)
+        raise typer.Exit(code=-1)
+
 
 
 # ==================== repository Command ====================
@@ -130,7 +192,7 @@ def update() -> None:
     """Update web repository to local."""
     pass
 
-
+# ==================== run Command ====================
 
 
 if __name__ == "__main__":

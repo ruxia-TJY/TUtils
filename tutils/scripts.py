@@ -8,15 +8,15 @@
 """
 
 from pathlib import Path
-from typing import List, Optional
-
-from cryptography.utils import read_only_property
+from typing import List, Optional, Dict
 from rich import print as rprint
 
 from .config import get_config
 from .repository.repositoryindexfile import RepositoryIndexFile
 from .repository.scriptindexfile import ScriptIndexFile
 from .utils import indent_print,get_table
+from .model import RepositoryModel,ScriptModel
+
 
 class ScriptManager:
     """Manage and execute scripts."""
@@ -27,94 +27,78 @@ class ScriptManager:
         """
 
         config = get_config()
-        self.repository:list = config.repository
 
-    def _get_repo_script_list(self,repo:dict) -> List[str]:
+        self.repository:list[RepositoryModel] = [RepositoryModel(i) for i in config.repository]
+
+    def get_script_by_path(self,script_path:str) -> Optional[ScriptModel]:
         """
-
-        :param repo:
-        :return:
+            get script by path, like repo_name.script_name
+        :param script_path: script path, like repo_name.script_name
+        :return: ScriptModel instance or None if not found
         """
-        scriptlist:list = []
-        if repo["type"]=="local":
-            dirpath = repo["path"].parent
-            for idx,script in enumerate(repo["scripts"]):
-                script_path = dirpath / script / "index.yaml"
-                if not script_path.exists():
-                    continue
-                script_model = ScriptIndexFile(script_path).get_instance()
-                scriptlist.append(script_model.name)
-        return scriptlist
+        repo_name,script_name = script_path.split(".")
+        repo = next((i for i in self.repository if i.name == repo_name),None)
+        if not repo: return None
+        scripts = repo.read_script_list()
 
-    def list_scripts(self, repo_name:List|None = None,printit:bool = False) -> List[str]:
+        script = next((i for i in scripts if i.name == script_name),None)
+        if not script: return None
+        return script
+
+    def list_scripts(self, repo_name:Optional[List] = None,printit:bool = False) -> List[str]:
         '''
-        Read list of scripts.
+          list of scripts.
         :param repo_name: if None, return all scripts, else return which want
-        :param printit: is print it in console
+        :param printit: print it in console if True
         :return: list of scripts
         '''
         scriptlist:list = []
 
-        repositories = [{"path":(Path(i["path"]) / "index.yaml"),"type":i["type"] }for i in self.repository]
-        repositories = [i for i in repositories if i["path"].exists()]
-
-        repositories_model = [RepositoryIndexFile(Path(i["path"])).to_dict() for i in repositories]
-
-        merged = [
-            {**d1,**d2}
-            for d1,d2 in zip(repositories_model,repositories)
-        ]
+        repositories = [i for i in self.repository if Path(i.index_file_path).exists()]
 
         if repo_name is None:
-            repo_name = [i["name"] for i in repositories_model]
-        # filter which want repo
-        repositories = [i for i in merged if i["name"] in repo_name]
+            repo_name = [i.name for i in repositories]
 
+        # filter which want repo
+        repositories = [i for i in repositories if i.name in repo_name]
 
         for repo in repositories:
-            if printit:
-                rprint(f'[bold]{repo["name"]}[/bold]\[{repo["quickly"]}]:')
-            scripts = self._get_repo_script_list(repo)
+            if printit: rprint(f'[bold]{repo.name}[/bold]:')
+            scripts = repo.read_script_list()
             for script in scripts:
-                indent_print(script)
+                if printit:indent_print(script.name)
+                scriptlist.append(f'{repo.name}.{script.name}')
         return scriptlist
 
-    def list_repo(self,printit:bool = False) -> List[str]:
-        '''
-        Read list of repositories.
-
-        :return: list of repositories
-        '''
+    def list_repo(self,printit:bool = False) -> List[RepositoryModel]:
+        """
+            list of repositories.
+        :param printit: print it if True
+        :return:
+        """
         repolist:list = []
 
         table = get_table()
         table.add_column("ID",justify="center",style="cyan",no_wrap=True)
         table.add_column("Name",justify="center")
-        table.add_column("Quickly",justify="center",style="green")
         table.add_column("Path",justify="center")
         table.add_column("Type",justify="center")
         table.add_column("link",justify="center")
         table.add_column("Script Count",justify="center",style="green")
 
         for idx,repository in enumerate(self.repository):
-            folder = Path(repository["path"])
-            type = repository["type"]
-            link = repository["link"] if type == "web" else ""
+            scripts_count = len(repository.scripts)
 
-            repository_yaml_path = Path(folder) / "index.yaml"
-            if repository_yaml_path.exists():
-                repository_index = RepositoryIndexFile(repository_yaml_path).get_instance()
-                scripts_count = len(repository_index.scripts)
-                table.add_row(str(idx),
-                              repository_index.name,
-                              repository_index.quickly,
-                              str(folder.resolve()),
-                              type,
-                              link,
-                              str(scripts_count))
-                repolist.append(f'{repository_index.name}\[{repository_index.quickly}] Path:{folder.home()} Type:{type} ')
-        if printit:
-            rprint(table)
+            table.add_row(str(idx),
+                          repository.name,
+                          str(repository.path),
+                          repository.type,
+                          repository.link,
+                          str(scripts_count))
+
+            repolist.append(repository)
+        if printit: rprint(table)
+
         return repolist
 
 

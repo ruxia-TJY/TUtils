@@ -6,7 +6,7 @@ from typing import Optional
 import typer
 import yaml
 
-from .models import AppConfig
+from .model import AppConfig
 
 
 class ConfigManager:
