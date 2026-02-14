@@ -2,7 +2,7 @@
 
 import json
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Optional
 import typer
 import yaml
 
@@ -70,7 +70,6 @@ class ConfigManager:
 
             config = AppConfig(**data)
             return config
-
         except Exception as e:
             return AppConfig()
 
@@ -109,7 +108,7 @@ class ConfigManager:
             if suffix in [".yaml", ".yml"]:
                 with open(self.config_path, "w", encoding="utf-8") as f:
                     yaml.dump(
-                        config.dict(),
+                        config.model_dump(),
                         f,
                         default_flow_style=False,
                         allow_unicode=True,
@@ -117,13 +116,14 @@ class ConfigManager:
                     )
             elif suffix == ".json":
                 with open(self.config_path, "w", encoding="utf-8") as f:
-                    json.dump(config.dict(), f, indent=2, ensure_ascii=False)
+                    json.dump(config.model_dump(), f, indent=2, ensure_ascii=False)
             else:
                 raise ValueError(f"Unsupported format: {suffix}")
         except Exception as e:
             raise typer.Exit(code=1)
 
-    def load_from_file(self, filepath: Path) -> AppConfig:
+    @staticmethod
+    def load_from_file(filepath: Path) -> AppConfig:
         """
         Load configuration from a specific repository.
 
@@ -135,7 +135,6 @@ class ConfigManager:
         """
         if not filepath.exists():
             raise FileNotFoundError(f"Config repository not found: {filepath}")
-
         try:
             suffix = filepath.suffix.lower()
 
@@ -171,7 +170,7 @@ class ConfigManager:
             if format.lower() in ["yaml", "yml"]:
                 with open(filepath, "w", encoding="utf-8") as f:
                     yaml.dump(
-                        config.dict(),
+                        config.model_dump(),
                         f,
                         default_flow_style=False,
                         allow_unicode=True,
@@ -179,7 +178,7 @@ class ConfigManager:
                     )
             elif format.lower() == "json":
                 with open(filepath, "w", encoding="utf-8") as f:
-                    json.dump(config.dict(), f, indent=2, ensure_ascii=False)
+                    json.dump(config.model_dump(), f, indent=2, ensure_ascii=False)
             else:
                 raise ValueError(f"Unsupported format: {format}")
 
@@ -200,7 +199,7 @@ class ConfigManager:
             Configuration value
         """
         keys = key.split(".")
-        value: any = self.config.dict()
+        value: any = self.config.model_dump()
 
         for k in keys:
             if isinstance(value, dict):
@@ -221,7 +220,7 @@ class ConfigManager:
             value: Value to set
         """
         keys = key.split(".")
-        config_dict = self.config.dict()
+        config_dict = self.config.model_dump()
         current = config_dict
 
         for k in keys[:-1]:
