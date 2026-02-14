@@ -10,8 +10,6 @@ class AppConfig(BaseModel):
     """Application configuration model."""
 
     # 应用配置
-    app_name: str = Field(default="TUtils", description="Application name")
-    app_version: str = Field(default="0.1.0", description="Application version")
     debug: bool = Field(default=False, description="Enable debug mode")
     log_level: str = Field(default="INFO", description="Logging level")
 

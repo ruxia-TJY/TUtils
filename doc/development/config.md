@@ -1,5 +1,14 @@
 # Config
 
+## Overview
+
+config file will be created in `~/.tutils/config.yaml` when first run, and you can edit it to change the configuration of TUtils.
+
+The program reads the configuration file each time it runs.
+
+## Content
+
+Configuration files are saved in YAML format. Example content:
 
 ```yaml
 app_name: TUtils

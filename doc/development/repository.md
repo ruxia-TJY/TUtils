@@ -1,13 +1,18 @@
 # Repository
 
-the repository dir:
+the repository structure:
 ```
 ├── index.yaml
 └── example dir 1
     ├── example code file.py
     └── index.yaml
 ```
+repository is a collection of script, and each script is a collection of file, the `index.yaml` in repository is used to index the script in repository, and the `index.yaml` in script is used to index the file in script.
 
+The program will ignore folders that do not contain an index.yaml file.
+
+
+## Content
 
 ### Repository index.yaml
 

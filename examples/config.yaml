@@ -1,5 +1,3 @@
-app_name: TUtils
-app_version: 0.1.0
 debug: false
 log_level: INFO
 use_color: true
