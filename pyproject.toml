@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "TUtils command-line utility toolkit"
 readme = "README.md"
 requires-python = ">=3.8"
-license={text="MIT"}
+license = "MIT"
 authors = [
   { name = "Jared3Dev",email="ruxia.tjy@qq.com"}
 ]
@@ -18,7 +18,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
 ]
 dependencies = [
-    "typer[all]",
+    "typer>=0.23.1",
     "rich",
     "pyyaml>=6.0",           # YAML 配置支持
     "pydantic>=1.10.0",      # 数据验证

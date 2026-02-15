@@ -7,6 +7,7 @@ import typer
 import yaml
 from . import const as C
 from .model import AppConfig
+from .scripts import get_script_manager
 
 
 class ConfigManager:
@@ -74,6 +75,7 @@ class ConfigManager:
             return AppConfig()
 
     def _create_default_config(self) -> AppConfig:
+        #TODO bug: build default config will not create Script
         """
         Create and save default configuration.
 
