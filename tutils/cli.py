@@ -41,7 +41,7 @@ def main(
     try:
         if version_flag:
             version()
-            raise typer.Exit()
+            typer.Exit(0)
 
     except Exception as e:
         typer.echo(e)
@@ -229,7 +229,6 @@ def remove(
             typer.Option(
             "-d", "--delete",
                 help="Delete the repository files from disk.",
-                is_flag=True
             ),
         ] = False,
 ) -> None:
