@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional
 import typer
 import yaml
-
+from . import const as C
 from .model import AppConfig
 
 
@@ -13,7 +13,7 @@ class ConfigManager:
     """Manage application configuration with auto-initialization."""
 
     # 默认配置目录位置
-    DEFAULT_CONFIG_DIR = Path.home() / ".tutils"
+    DEFAULT_CONFIG_DIR = C.CONFIG_DIR
     DEFAULT_CONFIG_NAME = "config.yaml"
 
     def __init__(self, config_path: Optional[Path] = None):
@@ -91,6 +91,14 @@ class ConfigManager:
         config.repository.append(responsity)
         self.save_config(config)
         return config
+
+    def check_repo_exist(self,path:Path) -> bool:
+        """
+        Check if repository exists in config.
+        :return:
+        """
+        repo = next((i for i in self.config.repository if Path(i["path"]).resolve() == path), None)
+        return repo is not None
 
     def save_config(self, config: Optional[AppConfig] = None) -> None:
         """

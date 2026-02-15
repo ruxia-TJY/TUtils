@@ -19,11 +19,25 @@ class RepositoryIndexFile:
         """Load repository index file model"""
         if not self.file_path:
             return RepositoryIndexFileModel()
+        if not self.file_path.exists():
+            return RepositoryIndexFileModel()
         with open(self.file_path, "r",encoding='utf-8') as f:
             data = yaml.safe_load(f) or {}
 
         file = RepositoryIndexFileModel(**data)
         return file
+
+    def read_from_model(self,model:RepositoryIndexFileModel):
+        """read from model"""
+        self.file = model
+
+    def save_file(self) -> bool:
+        """Save repository index file model to file path"""
+        if not self.file_path:
+            return False
+        with open(self.file_path, "w",encoding='utf-8') as f:
+            yaml.safe_dump(self.file.model_dump(), f, allow_unicode=True)
+        return True
 
     def to_dict(self) -> Dict[str, any]:
         """

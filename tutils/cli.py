@@ -1,16 +1,18 @@
 """Command-line interface using Typer."""
 from pathlib import Path
-from typing import Optional, Annotated, Literal
+from typing import Optional, Annotated, Literal, List
 import shlex
 import typer
 from rich.console import Console
 from rich import print as rprint
 
+from .repository.repositoryindexfile import RepositoryIndexFile
 from . import const as C
-from .model import ScriptModel
+from .model import ScriptModel,RepositoryModel
 from .runner import ProcessRunner
 from .config import get_config, get_config_manager
 from .scripts import get_script_manager
+from . import utils
 
 # 创建 Typer 应用
 app = typer.Typer(
@@ -149,7 +151,14 @@ def add(
                 help="Path to repository.",
                 file_okay=False,
                 dir_okay=True,
-                resolve_path=True,
+                # resolve_path=True,
+            )
+        ],
+        name:Annotated[
+            str,
+            typer.Argument(
+                ...,
+                help="Name of the repository.",
             )
         ],
         source: Annotated[
@@ -171,20 +180,87 @@ def add(
             return None
         config = get_config()
         cm = get_config_manager()
-        if not path.exists():
-            rprint(f"Path {path.absolute()} does not exist. dir will be created.")
-            path.mkdir(parents=True)
-        repo = {"path":str(path), "type":source,"link":link}
+
+        path = utils.resolve_repo_path(path)
+
+        # check path in config
+        if cm.check_repo_exist(path):
+            rprint("Repository already exists in config.")
+            raise typer.Exit()
+        sm = get_script_manager()
+        repos = sm.list_repo()
+        if any(i for i in repos if i.name == str(name)):
+            rprint(f"Repository name {name} already exists in repositories.")
+
+        repo = RepositoryIndexFile(
+            file_path=path / "index.yaml"
+        )
+
+        repo.file.name = name
+
+        if not sm.create_repo(repo):
+            rprint("Failed to create repository.")
+            raise typer.Exit()
+
+        repo = {"path": str(path), "type": source, "link": link}
         config.repository.append(repo)
         cm.save_config(config)
+        rprint("Repository added successfully!")
+
     except Exception as e:
         typer.echo(e)
         raise typer.Exit(code=-1)
 
 @repository_app.command()
-def remove(path: str) -> None:
+def remove(
+        repo_name: Annotated[
+            List[str],
+            typer.Argument(
+                ...,
+                help="Path to repository to remove. Can be the path or the name of the repository.",
+            ),
+        ],
+        remove_file: Annotated[
+            bool,
+            typer.Option(
+            "-d", "--delete",
+                help="Delete the repository files from disk.",
+                is_flag=True
+            ),
+        ] = False,
+) -> None:
     """Remove repository."""
-    pass
+    try:
+        repos = get_script_manager().list_repo()
+        exist_repo_list = [i for i in repos if i.name in repo_name]
+        no_repo_list = [i for i in repo_name if i not in [j.name for j in exist_repo_list]]
+        if len(no_repo_list):
+            rprint("Repository not found: " + ", ".join(no_repo_list)) if len(no_repo_list) else None
+            raise typer.Exit(code=-1)
+
+        config = get_config()
+        cm = get_config_manager()
+
+        for repo in exist_repo_list:
+            repo_config = {"path": repo.path, "type": repo.type, "link": repo.link}
+            config.repository.remove(repo_config)
+
+        cm.save_config(config)
+        if remove_file:
+            for repo in exist_repo_list:
+                path = Path(repo.path)
+                if path.exists() and path.is_dir():
+                    utils.remove_directory(path)
+        rprint("Repository removed successfully!")
+        if not remove_file:
+            rprint(
+                "Note: Repository files are not deleted. Use --delete option to remove files from disk."
+            )
+
+    except Exception as e:
+        typer.echo(e)
+        raise typer.Exit(code=-1)
+
 
 
 @repository_app.command()

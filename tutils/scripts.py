@@ -101,6 +101,21 @@ class ScriptManager:
 
         return repolist
 
+    def create_repo(self,repo:RepositoryIndexFile) -> bool:
+        """Create a new repository."""
+
+        path = Path(repo.file_path).parent
+
+        if not path.exists():
+            try:
+                path.mkdir(parents=True, exist_ok=True)
+            except Exception as e:
+                rprint(f"Failed to create repository directory: {e}")
+                return False
+
+        repo.save_file()
+
+        return True
 
 #  全局脚本管理器实例
 _script_manager: Optional[ScriptManager] = None

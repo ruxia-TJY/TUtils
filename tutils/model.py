@@ -96,8 +96,8 @@ class RepositoryModel(BaseModel):
             ))
         return scriptlist
 
-
     def set_by_config(self,config:dict):
+        """set value by config dict, like {"path": "path/to/repo", "type": "local", "link": ""}"""
         self.path = config["path"]
         self.type = config["type"]
         self.link = config["link"]
@@ -106,3 +106,10 @@ class RepositoryModel(BaseModel):
 
     def __str__(self) -> str:
         return f'name:{self.name} path:{self.path} type:{self.type} link:{self.link}'
+
+    def to_config(self):
+        return {
+            "path": self.path,
+            "type": self.type,
+            "link": self.link
+        }

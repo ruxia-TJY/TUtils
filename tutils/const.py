@@ -1,5 +1,5 @@
 """some const values for tutils"""
-
+from pathlib import Path
 
 version = "0.0.1"
 author = "Jared3Dev"
@@ -22,3 +22,8 @@ info = f"""TUtils - A powerful command-line tool.
     Report Bug or Feature: {issue} 
     if you like TUtils, please give it a star on GitHub: {url}
 """
+
+
+CONFIG_DIR = Path.home() / ".tutils"
+SCRIPTS_DIR = CONFIG_DIR / "Scripts"
+DEFAULT_REPO_DIR = SCRIPTS_DIR / "default"

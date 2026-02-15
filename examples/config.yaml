@@ -3,7 +3,7 @@ log_level: INFO
 use_color: true
 verbose: false
 repository:
-- path: /home/jared/.tutils/Scripts
+- path: /home/jared/.tutils/Scripts/default
   type: local
   link: https://github.com/tutils/tutils/index.yaml
 custom: {}

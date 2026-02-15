@@ -1,6 +1,6 @@
-rm -rf ~/.tutils/config.yaml
+rm -rf ~/.tutils
 
-cp -r ./examples/Scripts ~/.tutils/
+cp -r ./examples ~/.tutils/
 
 pip uninstall TUtils -y
 
