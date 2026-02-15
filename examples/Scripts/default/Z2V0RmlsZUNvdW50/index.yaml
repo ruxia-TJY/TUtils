@@ -1,4 +1,4 @@
-name: getFileCount
+name: tcount
 version: 0.0.1
 description: get current folder repository count
 author: Jared3Dev

@@ -76,7 +76,7 @@ def run_script(
             resolve_path=True)
     ],
         args: Annotated[
-            Optional[str],
+            List[str],
             typer.Argument(..., help="Arguments string passed to script (shell-like).")
         ] = None,
     timeout: Annotated[
@@ -89,7 +89,7 @@ def run_script(
     ] = None,
     debug: Annotated[
         Optional[bool],
-        typer.Option("--debug", help="Enable debug mode.")
+        typer.Option(...,"-d","--debug", help="Enable debug mode.")
     ] = None,
 ):
     """
@@ -112,9 +112,13 @@ def run_script(
             script_model = scripts.get_script_by_path(name)
             script = Path(script_model.folder_path) / script_model.run
 
-        args_list = shlex.split(args) if args else []
+        args_list = args if args else []
 
-        res = runner.run_script(str(script), args=args_list, timeout=timeout, max_lines=max_lines)
+        res = runner.run_script(str(script),
+                                args=args_list,
+                                timeout=timeout,
+                                max_lines=max_lines,
+                                debug=debug)
         if debug:
             Console().rule()
             rprint("Debug:")

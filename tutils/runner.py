@@ -23,13 +23,10 @@ class ProcessRunner:
         for raw in iter(stream.readline, b''):
             if stop_event.is_set():
                 break
-            try:
-                line = raw.decode(errors='replace').rstrip('\n')
-            except Exception:
-                line = str(raw)
-            if len(line):
-                collect.append(line)
-                rprint(f"{print_prefix}{line}",end="")
+
+            if len(raw):
+                collect.append(raw)
+                print(f"{print_prefix}{raw}",end="")
             count += 1
             if line_limit is not None and count >= line_limit:
                 on_limit_hit()
@@ -45,6 +42,7 @@ class ProcessRunner:
         args: Optional[List[str]] = None,
         timeout: Optional[float] = None,
         max_lines: Optional[int] = None,
+        debug:Optional[bool] = False,
     ) -> Dict:
         """
         Run script and stream output.
@@ -56,9 +54,12 @@ class ProcessRunner:
         args = [i[1:] for i in args]
 
         cmd = [self.exe, script_path] + args
+        if debug:
+            rprint(cmd)
         proc_env = os.environ.copy()
 
         proc_env.update(env.to_dict())
+        proc_env = {**proc_env,"FORCE_COLOR": "1"}  # ensure color output
 
         proc = subprocess.Popen(
             cmd,

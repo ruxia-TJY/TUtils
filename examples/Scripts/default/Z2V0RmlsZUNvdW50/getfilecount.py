@@ -1,39 +1,48 @@
 import os
-import signal
-import sys
+from pathlib import Path
+from typing import Annotated
 from rich.console import Console
-_stop = False
+import typer
 
-def _handle_term(signum, frame):
-    global _stop
-    _stop = True
-    print(f"Received signal {signum}, will stop soon...", flush=True)
+app = typer.Typer(
+    name='TCount',
+    help="Count all files in folder",
+)
 
-signal.signal(signal.SIGTERM, _handle_term)
-signal.signal(signal.SIGINT, _handle_term)
-
-def main():
+@app.command()
+def main(
+        path:Annotated[
+            Path,
+            typer.Argument(..., help="Path to count files in")
+        ] = Path.cwd(),
+        show:Annotated[
+            bool,
+            typer.Option(
+                "--show",
+                "-s",
+                help="Show all files and folders",
+                is_flag=True,
+            )
+        ] = False,
+):
     console = Console()
-    path = "/home/jared/.tutils"
+
     if not os.path.exists(path):
-        raise Exception(f'File {path} does not exist')
+        console.print("[red]The path does not exist![/red]")
+        return 0
 
     fileCount = 0
     dirCount = 0
 
-    if "show" in sys.argv:
-        for root, dirs, files in os.walk(path):
-            for dir in dirs:
-                dirCount += 1
-                console.print(os.path.join(root, dir),style='bold yellow')
+    for root, dirs, files in os.walk(path):
+        dirCount += len(dirs)
+        fileCount += len(files)
 
-            for file in files:
-                fileCount += 1
-                console.print(os.path.join(root, file),style='#af00ff')
-    else:
-        for root, dirs, files in os.walk(path):
-            dirCount += len(dirs)
-            fileCount += len(files)
+        for dir in dirs:
+            if show: console.print(os.path.join(root, dir),style='bold yellow')
+
+        for file in files:
+            if show:console.print(os.path.join(root, file),style='#af00ff')
 
     console.rule()
     console.print(f'Files Count:{fileCount}',style='bold green')
@@ -42,4 +51,4 @@ def main():
     return 0
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(app())

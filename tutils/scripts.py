@@ -13,7 +13,6 @@ from rich import print as rprint
 
 from .config import get_config
 from .repository.repositoryindexfile import RepositoryIndexFile
-from .repository.scriptindexfile import ScriptIndexFile
 from .utils import indent_print,get_table
 from .model import RepositoryModel,ScriptModel
 
