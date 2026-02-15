@@ -62,7 +62,7 @@ def show_script() -> None:
 @app.command()
 def version() -> None:
     """Show version information."""
-    rprint(C.version)
+    rprint(f'TUtils {C.version}')
 
 @app.command("run")
 def run_script(

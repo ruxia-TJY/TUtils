@@ -7,8 +7,6 @@ import typer
 import yaml
 from . import const as C
 from .model import AppConfig
-from .scripts import get_script_manager
-
 
 class ConfigManager:
     """Manage application configuration with auto-initialization."""

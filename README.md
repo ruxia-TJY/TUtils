@@ -9,7 +9,7 @@ See [doc](./docs/index.md) for more details.
   You can install TUtils using pip:
   
   ```
-  pip install tutils        # No,Not yet submitted to PyPI,Please install it from source code.
+  pip install tutils-cli
   ```
 
   After installation, you can use the `tutils` command followed by the desired subcommand to perform various tasks. For example:

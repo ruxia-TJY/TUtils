@@ -1,12 +1,18 @@
 """some const values for tutils"""
 from pathlib import Path
+from importlib.metadata import version as _get_version
 
-version = "0.0.1"
+try:
+    version = _get_version("TUtils-cli")
+except Exception:
+    version = "0.0.0"
 author = "Jared3Dev"
 email = "ruxia.tjy@qq.com"
 license = 'MIT'
 copy = f'Copyright (c) 2026 {author} <{email}>. All rights reserved.'
-thanks = []
+thanks = [
+
+]
 
 url = "https://github.com/ruxia-TJY/TUtils"
 issue = 'https://github.com/ruxia-TJY/TUtils/issues'
