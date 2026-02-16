@@ -196,7 +196,7 @@ def add(
             )
         ],
         source: Annotated[
-            Literal["local","web"],
+            Literal["local","remote"],
             typer.Option("--type","-t"),
         ] = "local",
         link: Annotated[
@@ -209,7 +209,7 @@ def add(
 ) -> None:
     """Add new repository."""
     try:
-        if source == "web" and not len(link):
+        if source == "remote" and not len(link):
             rprint("empty link.")
             return None
         config = get_config()
@@ -313,10 +313,97 @@ def delete_nonexist_repo() -> None:
         raise typer.Exit(code=-1)
 
 
+@repository_app.command("link")
+def link_repo(
+        repo_name: Annotated[
+            str,
+            typer.Argument(
+                ...,
+                help="repository name.",
+            )
+        ],
+        link: Annotated[
+            str,
+            typer.Argument(
+                ...,
+                help="repository link.",
+            )
+        ],
+) -> None:
+    """Link local repository to remote repository."""
+    try:
+        script = get_script_manager()
+        list_repo = script.list_repo()
+        repo = next((i for i in list_repo if i.name == repo_name), None)
+        if repo is None:
+            rprint(f'Repository {repo_name} not found.')
+            raise typer.Exit(code=-1)
+
+        config = get_config()
+        cm = get_config_manager()
+        for r in config.repository:
+            if r["path"] == repo.path:
+                r["type"] = "remote"
+                r["link"] = link
+
+        cm.save_config(config)
+    except Exception as e:
+        rprint(e)
+        raise typer.Exit(code=-1)
+
+@repository_app.command("type")
+def type_repo(
+        repo_name: Annotated[
+            str,
+            typer.Argument(
+                ...,
+                help="repository name.",
+            )
+        ],
+        type: Annotated[
+            Literal["local", "remote"],
+            typer.Argument(
+                ...,
+                help="repository type. local or remote.",
+            )
+        ],
+) -> None:
+    """Type local repository."""
+    try:
+        script = get_script_manager()
+        list_repo = script.list_repo()
+        repo = next((i for i in list_repo if i.name == repo_name), None)
+        if repo is None:
+            rprint(f'Repository {repo_name} not found.')
+            raise typer.Exit(code=-1)
+
+        if type == "remote" and repo.link is None:
+            rprint(f'Repository {repo_name} no link!,use link set it first')
+            raise typer.Exit(code=-1)
+
+        config = get_config()
+        cm = get_config_manager()
+        for r in config.repository:
+            if r["path"] == repo.path:
+                r["type"] = type
+
+        cm.save_config(config)
+    except Exception as e:
+        rprint(e)
+        raise typer.Exit(code=-1)
+
 @repository_app.command()
-def update() -> None:
-    """Update web repository to local."""
-    pass
+def update(
+        repo_name:Annotated[
+            Optional[List[str]],
+            typer.Argument(
+                ...,
+                help="repository update.",
+            )
+        ]= None,
+) -> None:
+    """Update remote repository to local."""
+    print(repo_name)
 
 # ==================== Script Command ====================
 @script_app.callback(invoke_without_command=True)

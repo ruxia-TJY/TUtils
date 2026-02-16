@@ -25,6 +25,16 @@ tutils <command> [<args>]
 
 ## COMMANDS
 
+### version
+
+Show version information.
+
+```
+tutils version
+```
+
+---
+
 ### show-script
 
 List all available scripts across all registered repositories.
@@ -110,7 +120,7 @@ tutils repository show <repo_name>
 Register a new repository.
 
 ```
-tutils repository add <path> <name> [--type local|web] [<link>]
+tutils repository add <path> <name> [--type local|remote] [<link>]
 ```
 
 `<path>`
@@ -119,11 +129,11 @@ tutils repository add <path> <name> [--type local|web] [<link>]
 `<name>`
 :   A unique name for the repository.
 
-`-t`, `--type` *{local,web}*
+`-t`, `--type` *{local,remote}*
 :   Repository source type. Defaults to `local`.
 
 `<link>`
-:   Remote repository URL. Required when `--type` is `web`.
+:   Remote repository URL. Required when `--type` is `remote`.
 
 **Examples:**
 
@@ -132,7 +142,7 @@ tutils repository add <path> <name> [--type local|web] [<link>]
 tutils repository add ./my-scripts my-repo
 
 # Add a remote repository
-tutils repository add ./my-scripts my-repo --type web https://github.com/user/repo
+tutils repository add ./my-scripts my-repo --type remote https://github.com/user/repo
 
 # Add by name, will be created under ~/.tutils/Scripts/
 tutils repository add File File
@@ -173,13 +183,61 @@ Remove stale entries whose paths no longer exist on disk.
 tutils repository clean
 ```
 
+#### repository link
+
+Link a local repository to a remote repository.
+
+```
+tutils repository link <repo_name> <link>
+```
+
+`<repo_name>`
+:   Name of the repository to link.
+
+`<link>`
+:   Remote repository URL.
+
+**Examples:**
+
+```bash
+# Link a local repository to a remote URL
+tutils repository link my-repo https://github.com/user/repo
+```
+
+#### repository type
+
+Change the source type of a repository.
+
+```
+tutils repository type <repo_name> <type>
+```
+
+`<repo_name>`
+:   Name of the repository.
+
+`<type>` *{local,remote}*
+:   New source type. If setting to `remote`, the repository must have a link configured first (use `repository link`).
+
+**Examples:**
+
+```bash
+# Change repository type to remote
+tutils repository type my-repo remote
+
+# Change repository type to local
+tutils repository type my-repo local
+```
+
 #### repository update
 
 Pull updates for remote repositories. *(Under development)*
 
 ```
-tutils repository update
+tutils repository update [<repo_name>...]
 ```
+
+`<repo_name>...`
+:   Optional. One or more repository names to update. If omitted, updates all remote repositories.
 
 ---
 

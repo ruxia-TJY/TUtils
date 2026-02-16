@@ -26,5 +26,5 @@ custom: {}
 
 + `repository`: the repository list, each repository is a dict with `path` `type` and `link`
     + `path`: the local path of repository
-    + `type`: the type of repository, now support `local` and `web`, if `web`,run command-line `repository update` while download to local `path`
-    + `link`: the link of repository, if type is `web`, it must be set
+    + `type`: the type of repository, now support `local` and `remote`, if `remote`,run command-line `repository update` while download to local `path`
+    + `link`: the link of repository, if type is `remote`, it must be set

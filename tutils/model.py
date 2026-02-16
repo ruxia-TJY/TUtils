@@ -31,7 +31,7 @@ class AppConfig(BaseModel):
     def __str__(self) -> str:
         """String representation."""
         return (
-            f"AppConfig(app_name={self.app_name}, debug={self.debug}, "
+            f"AppConfig(debug={self.debug}, "
             f"log_level={self.log_level})"
         )
 
