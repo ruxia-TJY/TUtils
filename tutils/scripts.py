@@ -44,6 +44,37 @@ class ScriptManager:
         if not script: return None
         return script
 
+    def list_repo_scripts(self,repo_name:str) -> None:
+        """show repo list"""
+        repositories = [i for i in self.repository if Path(i.index_file_path).exists()]
+        repo = next((i for i in repositories if i.name == repo_name),None)
+        if not repo: return None
+
+        list_script = repo.read_script_list()
+        if not len(list_script):
+            rprint(f"[bold]{repo_name}[/bold]: empty.")
+            return None
+
+        table = get_table()
+        table.add_column("ID",justify="center",style="cyan",no_wrap=True)
+        table.add_column("Name",justify="center",style="cyan",no_wrap=True)
+        table.add_column("Version",justify="center")
+        table.add_column("Path",justify="center")
+        table.add_column("Author",justify="center")
+        table.add_column("License",justify="center")
+        table.add_column("Description",justify="center")
+
+        for idx,script in enumerate(list_script):
+            table.add_row(str(idx),
+                          script.name,
+                          script.version,
+                          Path(script.folder_path).name,
+                          script.author,
+                          script.license,
+                          script.description,
+                          )
+        rprint(table)
+
     def list_scripts(self, repo_name:Optional[List] = None,printit:bool = False) -> List[str]:
         '''
           list of scripts.
@@ -79,7 +110,7 @@ class ScriptManager:
 
         table = get_table()
         table.add_column("ID",justify="center",style="cyan",no_wrap=True)
-        table.add_column("Name",justify="center")
+        table.add_column("Name",justify="center",no_wrap=True)
         table.add_column("Path",justify="center")
         table.add_column("Type",justify="center")
         table.add_column("link",justify="center")
@@ -93,7 +124,8 @@ class ScriptManager:
                           str(repository.path),
                           repository.type,
                           repository.link,
-                          str(scripts_count))
+                          str(scripts_count),
+                          end_section=True)
 
             repolist.append(repository)
         if printit and len(repolist): rprint(table)

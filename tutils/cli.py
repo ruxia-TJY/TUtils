@@ -21,8 +21,18 @@ app = typer.Typer(
 )
 
 # 创建子命令组
-repository_app = typer.Typer(help="Repository management commands.")
+repository_app = typer.Typer(
+    help="Repository management commands. ",
+    invoke_without_command=True,
+)
 app.add_typer(repository_app,name="repository")
+app.add_typer(repository_app,name="repo",hidden=True)
+
+script_app = typer.Typer(
+    help="Script management commands. ",
+    invoke_without_command=True,
+)
+app.add_typer(script_app,name="script")
 
 # ==================== Main Command ====================
 
@@ -44,8 +54,9 @@ def main(
             typer.Exit(0)
 
     except Exception as e:
-        typer.echo(e)
+        rprint(e)
         raise typer.Exit(code=-1)
+
 
 @app.command()
 def show_script() -> None:
@@ -56,7 +67,7 @@ def show_script() -> None:
         scripts = get_script_manager()
         scripts.list_scripts(None,True)
     except Exception as e:
-        typer.echo(e)
+        rprint(e)
         raise typer.Exit(code=-1)
 
 @app.command()
@@ -130,21 +141,40 @@ def run_script(
 
 
 # ==================== repository Command ====================
-@repository_app.command("list")
-def list_repo() -> None:
-    '''Show repository list.'''
+
+@repository_app.callback(invoke_without_command=True)
+def repository_default(ctx: typer.Context) -> None:
+    """Repository management commands."""
+    if ctx.invoked_subcommand is not None:
+        return
     try:
+        # show repo list
         scripts = get_script_manager()
         repos = scripts.list_repo(True)
         if not len(repos):
             rprint("empty.")
-            return None
     except Exception as e:
-        typer.echo(e)
+        rprint(e)
         raise typer.Exit(code=-1)
-    else:
-        rprint(f'Done!')
 
+@repository_app.command("show")
+def show_repo_scripts(
+        repo_name: Annotated[
+            str,
+            typer.Argument(
+                ...,
+                help="show repository scripts.",
+            )
+        ]
+) -> None:
+    """Show all scripts repository."""
+    try:
+        scripts = get_script_manager()
+        scripts.list_repo_scripts(repo_name)
+
+    except Exception as e:
+        rprint(e)
+        raise typer.Exit(code=-1)
 
 @repository_app.command()
 def add(
@@ -212,7 +242,7 @@ def add(
         rprint("Repository added successfully!")
 
     except Exception as e:
-        typer.echo(e)
+        rprint(e)
         raise typer.Exit(code=-1)
 
 @repository_app.command()
@@ -261,9 +291,26 @@ def remove(
             )
 
     except Exception as e:
-        typer.echo(e)
+        rprint(e)
         raise typer.Exit(code=-1)
 
+@repository_app.command("clean")
+def delete_nonexist_repo() -> None:
+    """Remove repository which is non-exist."""
+    try:
+        script = get_script_manager()
+        list_repo = script.list_repo()
+        nonexist_list_repo = [i.to_config() for i in list_repo if len(i.name) == 0]
+
+        config = get_config()
+        cm = get_config_manager()
+        config.repository = [i for i in config.repository if i not in nonexist_list_repo]
+
+        cm.save_config(config)
+        rprint(f"clean {len(nonexist_list_repo)} repositories.")
+    except Exception as e:
+        rprint(e)
+        raise typer.Exit(code=-1)
 
 
 @repository_app.command()
@@ -271,7 +318,18 @@ def update() -> None:
     """Update web repository to local."""
     pass
 
-# ==================== run Command ====================
+# ==================== Script Command ====================
+@script_app.callback(invoke_without_command=True)
+def script_default(ctx: typer.Context) -> None:
+    if ctx.invoked_subcommand is not None:
+        return
+
+    try:
+        ctx.get_help()
+    except Exception as e:
+        rprint(e)
+        raise typer.Exit(code=-1)
+
 
 
 if __name__ == "__main__":
