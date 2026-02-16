@@ -96,7 +96,7 @@ class ScriptManager:
                           str(scripts_count))
 
             repolist.append(repository)
-        if printit: rprint(table)
+        if printit and len(repolist): rprint(table)
 
         return repolist
 

@@ -73,7 +73,6 @@ class ConfigManager:
             return AppConfig()
 
     def _create_default_config(self) -> AppConfig:
-        #TODO bug: build default config will not create Script
         """
         Create and save default configuration.
 
@@ -81,15 +80,9 @@ class ConfigManager:
             AppConfig object
         """
         config = AppConfig()
-        defaultpath = Path.home() / ".tutils" / "Scripts"
-        responsity = {
-            "path":str(defaultpath),
-            "type":"local",
-            "link":"https://github.com/tutils/tutils/index.yaml",
-        }
-
-        config.repository.append(responsity)
         self.save_config(config)
+        if not C.SCRIPTS_DIR.exists():
+            C.SCRIPTS_DIR.mkdir(parents=True, exist_ok=True)
         return config
 
     def check_repo_exist(self,path:Path) -> bool:
