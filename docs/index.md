@@ -17,6 +17,7 @@ If you are new to TUtils, start here:
 
 1. [Installation](installation.md)
 2. [Quick Start](quickstart.md)
+3. [CLI Usage](cli-usage.md)
 
 ---
 
