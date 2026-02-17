@@ -66,9 +66,6 @@ tutils run <script> [<args>...] [options]
 `--timeout` *FLOAT*
 :   Maximum execution time in seconds. The process is killed after this limit.
 
-`--max-lines` *INT*
-:   Maximum number of output lines. The process is stopped once this limit is reached.
-
 `-d`, `--debug`
 :   Enable debug mode. Prints additional diagnostic information after execution.
 
@@ -84,8 +81,8 @@ tutils run tcount :--show
 # Run a script from a specific repository
 tutils run File.tcount
 
-# Set a 30-second timeout and cap output at 100 lines
-tutils run tcount --timeout 30 --max-lines 100
+# Set a 30-second timeout
+tutils run tcount --timeout 30
 
 # Run in debug mode
 tutils run tcount -d

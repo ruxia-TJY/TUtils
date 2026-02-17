@@ -72,6 +72,7 @@ class ScriptManager:
                           script.author,
                           script.license,
                           script.description,
+                          end_section=True
                           )
         rprint(table)
 

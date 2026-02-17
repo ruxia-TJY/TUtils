@@ -22,6 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `list_repo_scripts` table missing row separators (`end_section`)
+- First run build directories issue
+- Empty repo print issue
+- Sub script color output
+- Typer version too lower error
 - `RepositoryIndexFileModel` and `ScriptIndexFileModel`: `scripts`, `src`, `param` fields now coerce `null` YAML values to empty lists instead of raising a Pydantic validation error
 - `Env.to_dict()`: stringify all values so `WORK_DIR` (a `Path` object) is correctly passed as a string in subprocess environment variables
 - CLI usage documentation (`docs/cli-usage.md`) in GNU/Google style
@@ -34,7 +39,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `script` subcommand group with callback
 - `repository` default callback to list repos when no subcommand is given
 - `list_repo_scripts` method in ScriptManager
-
 - `version` command to show version information
 - `show-script` command to list all scripts
 - `run` command to run python scripts with streaming output, timeout and max-lines controls
@@ -50,14 +54,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `ProcessRunner`: subprocess inherits terminal directly instead of piping, preserving rich color and formatting output
+- Remove `--max-lines` option from `run` command
 - Rename repository type `web` to `remote` across CLI, config and documentation
 - Remove `app_name` from `AppConfig` string representation
 - Improve repo table display: add row separators, prevent Name column from being squeezed
 - Replace `typer.echo` with `rprint` for consistent Rich output
-
-### Fixed
-
-- First run build directories issue
-- Empty repo print issue
-- Sub script color output
-- Typer version too lower error

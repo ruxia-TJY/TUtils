@@ -94,10 +94,6 @@ def run_script(
         Optional[float],
         typer.Option("--timeout", help="Timeout seconds (float).")
     ] = None,
-    max_lines: Annotated[
-        Optional[int],
-        typer.Option("--max-lines", help="Max output lines before stopping the process.")
-    ] = None,
     debug: Annotated[
         Optional[bool],
         typer.Option(...,"-d","--debug", help="Enable debug mode.")
@@ -128,7 +124,6 @@ def run_script(
         res = runner.run_script(str(script),
                                 args=args_list,
                                 timeout=timeout,
-                                max_lines=max_lines,
                                 debug=debug)
         if debug:
             Console().rule()
