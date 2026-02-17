@@ -113,7 +113,7 @@ def run_script(
 
         # assume script is path
         if not script.exists():
-            # if do not exist, try to find in repositories
+            # if not exist, try to find in repositories
             scripts = get_script_manager()
             script_list = scripts.list_scripts(printit=False)
             name = next((i for i in script_list if i.endswith(script.name)), None)
@@ -403,7 +403,27 @@ def update(
         ]= None,
 ) -> None:
     """Update remote repository to local."""
-    print(repo_name)
+    try:
+        script = get_script_manager()
+        repos = script.list_repo()
+        repos_name = [i.name for i in repos]
+        if repo_name is None:
+            repo_name = repos_name
+        if not set(repo_name).issubset(set(repos_name)):
+            rprint(f"Repository name has not found.")
+            raise typer.Exit(code=-1)
+
+        repos = [i for i in repos if i.name in repo_name and i.type == "remote"]
+
+        for repo in repos:
+            repo.update_to_local()
+
+
+    except Exception as e:
+        rprint(e)
+        raise typer.Exit(code=-1)
+
+
 
 # ==================== Script Command ====================
 @script_app.callback(invoke_without_command=True)

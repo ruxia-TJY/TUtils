@@ -1,5 +1,5 @@
 """repository and script model"""
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Any, Dict, List
 
 
@@ -7,6 +7,11 @@ class RepositoryIndexFileModel(BaseModel):
     """Repository index file yaml model."""
     name:str = Field(default="",description="Name of the index file")
     scripts:List[str] = Field(default_factory=list,description="Script files")
+
+    @field_validator("scripts", mode="before")
+    @classmethod
+    def _coerce_none(cls, v):
+        return v if v is not None else []
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
@@ -23,6 +28,11 @@ class ScriptIndexFileModel(BaseModel):
     src:List[str] = Field(default_factory=list,description="Source code of the script")
     license:str = Field(default="",description="License of the script")
     param:List[Dict[str, str]] = Field(default_factory=list,description="Parameters of the script")
+
+    @field_validator("src", "param", mode="before")
+    @classmethod
+    def _coerce_none(cls, v):
+        return v if v is not None else []
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""

@@ -60,7 +60,6 @@ class ProcessRunner:
 
         proc_env.update(env.to_dict())
         proc_env = {**proc_env,"FORCE_COLOR": "1"}  # ensure color output
-
         proc = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,

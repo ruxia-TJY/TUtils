@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `tutils/exceptions.py`: custom exception hierarchy (`TUtilsError`, `ConfigError`, `RepositoryError`, `ScriptError` and subclasses)
+- `tutils/repository/gitfetcher.py`: `GitFetcher` class to clone specific paths via git sparse-checkout without fetching the full repository
+- `utils.is_url()`: validate whether a string is a well-formed http/https/ftp URL
+- `utils.url_dirname()`: return the parent directory portion of a URL
+- `utils.url_join()`: safely join URL path segments (ignores leading slashes in parts)
+- `utils.download_file()`: download a remote file with a Rich progress bar; sends `Cache-Control: no-cache` headers to bypass CDN caching
+- `utils.is_url_status_ok()`: check whether a URL responds with HTTP 200 (uses HEAD request)
+- `utils.is_reachable()`: check TCP-level connectivity to a URL host
+- `RepositoryModel.update_to_local()`: download remote repository index and all script files to the local path
+- `repository update` command: implemented to pull remote repositories by name (or all remote repos if no name given)
+
+### Fixed
+
+- `RepositoryIndexFileModel` and `ScriptIndexFileModel`: `scripts`, `src`, `param` fields now coerce `null` YAML values to empty lists instead of raising a Pydantic validation error
+- `Env.to_dict()`: stringify all values so `WORK_DIR` (a `Path` object) is correctly passed as a string in subprocess environment variables
 - CLI usage documentation (`docs/cli-usage.md`) in GNU/Google style
 - `repo` as hidden alias for `repository` subcommand
 - `repository show` command to display scripts in a repository

@@ -1,9 +1,26 @@
 """Configuration data models using Pydantic."""
+from functools import total_ordering
 from pathlib import Path
 from typing import Any, Dict, Optional, List
+import time
+
+from .repository.model import RepositoryIndexFileModel
 from .repository.repositoryindexfile import RepositoryIndexFile
 from .repository.scriptindexfile import ScriptIndexFile
 from pydantic import BaseModel, Field
+from . import utils
+from . import exceptions
+from rich.console import Console
+from rich.progress import (
+    BarColumn,
+    DownloadColumn,
+    Progress,
+    TaskID,
+    TextColumn,
+    TimeRemainingColumn,
+    TransferSpeedColumn,
+)
+import requests
 
 
 class AppConfig(BaseModel):
@@ -53,6 +70,10 @@ class ScriptModel(BaseModel):
     src:List[str] = Field(default_factory=list,description="Source code of the script")
     license:str = Field(default="",description="License of the script")
     folder_path:str = Field(default="",description="Path to the script")
+
+    def read_by_index_file(self) -> None:
+        """As Option, just try load if used"""
+        pass
 
 class RepositoryModel(BaseModel):
     """Repository model."""
@@ -113,3 +134,54 @@ class RepositoryModel(BaseModel):
             "type": self.type,
             "link": self.link
         }
+
+    def update_to_local(self):
+
+        console = Console()
+
+        try:
+            console.log(f'Update {self.name}')
+            if self.type == "local":
+                return
+            if self.link is None:
+                return
+
+            path = Path(self.path)
+
+            if not path.exists():
+                raise exceptions.RepositoryLocalPathNotExistError(f"Path does not exist: {self.path}")
+
+            if not utils.is_url(self.link):
+                raise exceptions.RepositoryInvalidLinkError(f"Invalid url: {self.link}")
+
+            if not utils.is_url_status_ok(self.link):
+                raise exceptions.RepositoryConnnectFailedError(f"Connect Failed: {self.link}")
+
+            # download repository index file
+            repo_index_file_path = path / "index.yaml"
+            utils.download_file(self.link, repo_index_file_path)
+            self.set_by_index_file()
+
+            repo_remote_dir_path = utils.url_dirname(self.link)
+
+            # download script
+            for idx,script in enumerate(self.scripts):
+                script_local_dir_path = path / script
+                script_local_index_file_path = script_local_dir_path / "index.yaml"
+                script_remote_dir_path = utils.url_join(repo_remote_dir_path, script)
+                script_remote_index_file_path = utils.url_join(script_remote_dir_path, "index.yaml")
+
+                utils.download_file(script_remote_index_file_path, script_local_index_file_path)
+
+                script_model = ScriptIndexFile(script_local_index_file_path).get_instance()
+                files = script_model.src
+                for file in files:
+                    file_remote_path = utils.url_join(script_remote_dir_path, file)
+                    file_local_path = script_local_dir_path / file
+
+                    utils.download_file(file_remote_path, file_local_path)
+
+            console.log(f"[green]Repository {self.name} is updated![/green]")
+        except Exception as e:
+            console.log(f'{e}')
+            console.print('[red]Update Failed[/red]')

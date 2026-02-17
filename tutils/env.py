@@ -6,5 +6,5 @@ class Env:
     WORK_DIR: str = ""      # Current working directory
 
     def to_dict(self):
-        return vars(self)
+        return {k: str(v) for k, v in vars(self).items()}
 env = Env()
