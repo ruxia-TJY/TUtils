@@ -56,7 +56,7 @@ tutils run <script> [<args>...] [options]
 #### Positional arguments
 
 `<script>`
-:   Path to a Python script, or a script name. If the path does not exist, `tutils` automatically searches all registered repositories for a matching script.
+:   Path to a Python script, or a script name. If the path does not exist, `tutils` automatically searches all registered repositories for a matching script. If no exact match is found, fuzzy search is used to suggest similar script names.
 
 `<args>`
 :   Arguments passed through to the script.
@@ -86,6 +86,9 @@ tutils run tcount --timeout 30
 
 # Run in debug mode
 tutils run tcount -d
+
+# Fuzzy match: if "tcont" doesn't exist, tutils will suggest "File.tcount"
+tutils run tcont
 ```
 
 ---
@@ -242,7 +245,70 @@ tutils repository update [<repo_name>...]
 
 Manage scripts. When invoked without a subcommand, displays help.
 
-> TODO: Implement query, display repository info, and other commands.
+#### script search
+
+Fuzzy search scripts by name. Matches are scored against the script name part (after the dot), not the repository prefix.
+
+```
+tutils script search <script> [<repo_name>...]
+```
+
+`<script>`
+:   Search query string.
+
+`<repo_name>...`
+:   Optional. Filter search to specific repositories.
+
+**Examples:**
+
+```bash
+# Fuzzy search across all repositories
+tutils script search rmb
+
+# Search within a specific repository
+tutils script search ico Image
+```
+
+#### script info
+
+Display detailed information about a script, including repository, author, version, description, entry point, source files, etc.
+
+```
+tutils script info <script_name> [<repo_name>] [options]
+```
+
+`<script_name>`
+:   Name of the script to inspect.
+
+`<repo_name>`
+:   Optional. Repository name to narrow the lookup. If omitted, searches all repositories by suffix match.
+
+#### Options
+
+`-d`, `--description`
+:   Print only the script description.
+
+`-s`, `--src`
+:   Print only the script source file list.
+
+`-r`, `--run`
+:   Print only the script entry point.
+
+**Examples:**
+
+```bash
+# Show full info for a script
+tutils script info tcount
+
+# Show info for a script in a specific repository
+tutils script info tcount File
+
+# Show only description
+tutils script info tcount -d
+
+# Show only entry point
+tutils script info tcount -r
+```
 
 ---
 

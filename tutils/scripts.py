@@ -7,6 +7,7 @@
   |- index.yaml
 """
 
+from difflib import SequenceMatcher
 from pathlib import Path
 from typing import List, Optional, Dict
 from rich import print as rprint
@@ -43,6 +44,29 @@ class ScriptManager:
         script = next((i for i in scripts if i.name == script_name),None)
         if not script: return None
         return script
+
+    def fuzzy_search(self, query: str, repo_name: Optional[List] = None, cutoff: float = 0.4) -> List[tuple]:
+        """
+        Fuzzy search scripts by name.
+        :param query: search query string
+        :param repo_name: filter by repository names
+        :param cutoff: minimum similarity score (0.0 ~ 1.0)
+        :return: list of (script_path, score) sorted by score descending
+        """
+        script_list = self.list_scripts(repo_name)
+        query_lower = query.lower()
+        results = []
+        for name in script_list:
+            # only match against script name part (after the dot)
+            script_name = name.split(".", 1)[-1].lower() if "." in name else name.lower()
+            if query_lower in script_name:
+                score = 0.9 + 0.1 * (len(query) / len(script_name))
+            else:
+                score = SequenceMatcher(None, query_lower, script_name).ratio()
+            if score >= cutoff:
+                results.append((name, round(score, 3)))
+        results.sort(key=lambda x: x[1], reverse=True)
+        return results
 
     def list_repo_scripts(self,repo_name:str) -> None:
         """show repo list"""

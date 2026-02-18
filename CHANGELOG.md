@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `ScriptManager.fuzzy_search()`: fuzzy search scripts by name using `difflib.SequenceMatcher`, matches only against the script name part (after the dot)
+- `script search` command: fuzzy search scripts with scored results table
+- `script info` command: display detailed script information with `-d`/`-s`/`-r` options for description, source files, and entry point
+- `run` command: fuzzy search fallback when exact script match is not found, suggests similar script names
 - `tutils/exceptions.py`: custom exception hierarchy (`TUtilsError`, `ConfigError`, `RepositoryError`, `ScriptError` and subclasses)
 - `tutils/repository/gitfetcher.py`: `GitFetcher` class to clone specific paths via git sparse-checkout without fetching the full repository
 - `utils.is_url()`: validate whether a string is a well-formed http/https/ftp URL

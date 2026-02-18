@@ -1,7 +1,6 @@
 """Command-line interface using Typer."""
 from pathlib import Path
 from typing import Optional, Annotated, Literal, List
-import shlex
 import typer
 from rich.console import Console
 from rich import print as rprint
@@ -114,8 +113,17 @@ def run_script(
             script_list = scripts.list_scripts(printit=False)
             name = next((i for i in script_list if i.endswith(script.name)), None)
             if name is None:
-                rprint(f"Script {script.name} not found.")
+                # fuzzy search fallback
+                matches = scripts.fuzzy_search(script.name)
+                if not matches:
+                    rprint(f"Script [bold]{script.name}[/bold] not found.")
+                    raise typer.Exit(code=-1)
+
+                rprint(f"Script [bold]{script.name}[/bold] not found. Did you mean:")
+                for m, score in matches[:5]:
+                    rprint(f"  - {m}")
                 raise typer.Exit(code=-1)
+
             script_model = scripts.get_script_by_path(name)
             script = Path(script_model.folder_path) / script_model.run
 
@@ -432,6 +440,129 @@ def script_default(ctx: typer.Context) -> None:
         rprint(e)
         raise typer.Exit(code=-1)
 
+@script_app.command("search")
+def script_search(
+        script: Annotated[
+            str,
+            typer.Argument(
+                ...,
+                help="script name to fuzzy search.",
+            )
+        ],
+        repo_name: Annotated[
+            Optional[List[str]],
+            typer.Argument(
+                ...,
+                help="repository name.",
+            )
+        ] = None,
+) -> None:
+    """Fuzzy search scripts by name."""
+    try:
+        sm = get_script_manager()
+        matches = sm.fuzzy_search(script, repo_name)
+        if not matches:
+            rprint(f"No scripts matching [bold]{script}[/bold].")
+            raise typer.Exit()
+        table = utils.get_table()
+        table.add_column("Script", style="cyan", no_wrap=True)
+        table.add_column("Score", justify="center", style="green")
+        for name, score in matches:
+            table.add_row(name, f"{score:.1%}")
+        rprint(table)
+
+    except Exception as e:
+        rprint(e)
+        raise typer.Exit(code=-1)
+
+@script_app.command("info")
+def script_info(
+        script_name: Annotated[
+            str,
+            typer.Argument(...,
+                           help="script name.",)
+        ],
+        repo_name: Annotated[
+            Optional[str],
+            typer.Argument(
+                ...,
+                help="repository name.",
+            )
+        ] = None,
+        description: Annotated[
+            bool,
+            typer.Option(
+                ...,
+                "--description","-d",
+                help="show script self description.",
+            )
+        ] = False,
+        src: Annotated[
+            bool,
+            typer.Option(
+                ...,
+                "--src","-s",
+                help="show script source code.",
+            )
+        ] = False,
+        run: Annotated[
+            bool,
+            typer.Option(
+                ...,
+                "--run","-r",
+                help="show script run code.",
+            ),
+        ] = False,
+) -> None:
+    try:
+        script_manager = get_script_manager()
+        script_list = script_manager.list_scripts()
+        if repo_name is None:
+            name = next((i for i in script_list if i.endswith(script_name)), None)
+        else:
+            name = next((i for i in script_list if i == f'{repo_name}.{script_name}'), None)
+
+        if name is None:
+            rprint(f"Script {script_name} not found.")
+            raise typer.Exit(code=-1)
+
+        script = script_manager.get_script_by_path(name)
+        if script is None:
+            rprint(f"Script {script_name} not found.")
+            raise typer.Exit(code=-1)
+
+        if description:
+            rprint(script.description)
+            return
+
+        if src:
+            rprint(script.src)
+            return
+
+        if run:
+            rprint(script.run)
+            return
+
+
+        table = utils.get_table()
+        table.add_column("name", justify="center",style="cyan", no_wrap=True)
+        table.add_column("value", justify="left", style="green")
+
+        table.add_row('repository',script.repository,end_section=True)
+        table.add_row("name", script.name,end_section=True)
+        table.add_row("author", script.author,end_section=True)
+        table.add_row("version", script.version,end_section=True)
+        table.add_row("description", script.description,end_section=True)
+        table.add_row("email", script.email,end_section=True)
+        table.add_row("runs", script.run,end_section=True)
+        table.add_row("license", script.license,end_section=True)
+        table.add_row("path", script.folder_path,end_section=True)
+        table.add_row("src", '\n'.join(script.src),end_section=True)
+        rprint(table)
+
+    except Exception as e:
+        rprint(e)
+        raise typer.Exit(code=-1)
 
 
 if __name__ == "__main__":
