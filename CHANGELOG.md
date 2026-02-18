@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- First run setup: on first launch, automatically download all default repositories defined in `DEFAULT_REPO_LIST` via `_first_run_setup()`, then set `is_first_run = False` in config so it only runs once
 - `ScriptManager.fuzzy_search()`: fuzzy search scripts by name using `difflib.SequenceMatcher`, matches only against the script name part (after the dot)
 - `script search` command: fuzzy search scripts with scored results table
 - `script info` command: display detailed script information with `-d`/`-s`/`-r` options for description, source files, and entry point

@@ -1,32 +1,19 @@
 """Configuration data models using Pydantic."""
-from functools import total_ordering
 from pathlib import Path
 from typing import Any, Dict, Optional, List
-import time
-
-from .repository.model import RepositoryIndexFileModel
 from .repository.repositoryindexfile import RepositoryIndexFile
 from .repository.scriptindexfile import ScriptIndexFile
 from pydantic import BaseModel, Field
 from . import utils
 from . import exceptions
 from rich.console import Console
-from rich.progress import (
-    BarColumn,
-    DownloadColumn,
-    Progress,
-    TaskID,
-    TextColumn,
-    TimeRemainingColumn,
-    TransferSpeedColumn,
-)
-import requests
 
 
 class AppConfig(BaseModel):
     """Application configuration model."""
 
     # 应用配置
+    is_first_run:bool = Field(default=True, description="Whether or not to run the first time")
     debug: bool = Field(default=False, description="Enable debug mode")
     log_level: str = Field(default="INFO", description="Logging level")
 

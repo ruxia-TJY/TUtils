@@ -17,7 +17,7 @@ thanks = [
 url = "https://github.com/ruxia-TJY/TUtils"
 issue = 'https://github.com/ruxia-TJY/TUtils/issues'
 
-last_update_time = "June 14, 2026"
+last_update_time = "Feb. 18, 2026"
 
 
 info = f"""TUtils - A powerful command-line tool.
@@ -32,4 +32,18 @@ info = f"""TUtils - A powerful command-line tool.
 
 CONFIG_DIR = Path.home() / ".tutils"
 SCRIPTS_DIR = CONFIG_DIR / "Scripts"
-DEFAULT_REPO_DIR = SCRIPTS_DIR / "default"
+# DEFAULT_REPO_DIR = SCRIPTS_DIR / "default"
+
+DEFAULT_REPO_LIST = [
+    {
+        "path": str(SCRIPTS_DIR / "File"),
+        "type": "remote",
+        "link":"https://raw.githubusercontent.com/ruxia-TJY/tutils-repo/main/File/index.yaml"
+    },
+    {
+        "path": str(SCRIPTS_DIR / "Image"),
+        "type": "remote",
+        "link":"https://raw.githubusercontent.com/ruxia-TJY/tutils-repo/main/Image/index.yaml"
+    }
+
+]

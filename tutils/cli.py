@@ -35,6 +35,22 @@ app.add_typer(script_app,name="script")
 
 # ==================== Main Command ====================
 
+def _first_run_setup() -> None:
+    """Initialize default repositories on first run."""
+    rprint("[bold]First run detected. Setting up default repositories...[/bold]")
+    cm = get_config_manager()
+    config = get_config()
+    config.repository = C.DEFAULT_REPO_LIST
+    for repo_config in config.repository:
+        path = Path(repo_config["path"])
+        path.mkdir(parents=True, exist_ok=True)
+        repo = RepositoryModel(config=repo_config)
+        repo.update_to_local()
+
+    config.is_first_run = False
+    cm.save_config(config)
+
+
 @app.callback(invoke_without_command=True)
 def main(
         version_flag: Annotated[
@@ -48,6 +64,10 @@ def main(
         ] = None,
 ) -> None:
     try:
+        config = get_config()
+        if config.is_first_run:
+            _first_run_setup()
+
         if version_flag:
             version()
             typer.Exit(0)
