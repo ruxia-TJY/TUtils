@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `doc` command: start a local HTTP documentation server and open it in the default browser (`tutils doc [--port PORT] [--no-browser]`)
+- `tutils/docs_server.py`: lightweight HTTP server that renders Markdown files from `docs/` as styled HTML pages, with auto-generated sidebar navigation
+- `markdown>=3.4` added as a dependency for Markdown-to-HTML rendering in the `doc` command
+- `docs/` directory is now bundled inside the wheel (`tutils/docs/`) via hatchling `force-include`, so the `doc` command works after installation
 - First run setup: on first launch, automatically download all default repositories defined in `DEFAULT_REPO_LIST` via `_first_run_setup()`, then set `is_first_run = False` in config so it only runs once
 - `ScriptManager.fuzzy_search()`: fuzzy search scripts by name using `difflib.SequenceMatcher`, matches only against the script name part (after the dot)
 - `script search` command: fuzzy search scripts with scored results table

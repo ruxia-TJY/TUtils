@@ -161,6 +161,43 @@ def run_script(
         rprint(e)
         raise typer.Exit(code=-1)
 
+@app.command("doc")
+def doc_server(
+    port: Annotated[
+        int,
+        typer.Option("--port", "-p", help="Port for the documentation server."),
+    ] = 8765,
+    no_browser: Annotated[
+        bool,
+        typer.Option("--no-browser", help="Do not open the browser automatically."),
+    ] = False,
+) -> None:
+    """Start a local documentation server and open it in the browser."""
+    import webbrowser
+    from .docs_server import create_server
+
+    try:
+        server = create_server(port)
+    except FileNotFoundError as e:
+        rprint(f"[red]{e}[/red]")
+        raise typer.Exit(code=-1)
+    except OSError as e:
+        rprint(f"[red]Failed to start server on port {port}: {e}[/red]")
+        raise typer.Exit(code=-1)
+
+    url = f"http://localhost:{port}"
+    rprint(f"[bold green]Docs server running at {url}[/bold green]")
+    rprint("[dim]Press Ctrl+C to stop.[/dim]")
+
+    if not no_browser:
+        webbrowser.open(url)
+
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        server.shutdown()
+        rprint("\n[bold]Documentation server stopped.[/bold]")
+
 
 
 # ==================== repository Command ====================
